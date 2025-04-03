@@ -20,9 +20,13 @@ export default function TabIcon({
 }: TabIconProps) {
   return (
     <View
-      className={`${
-        focused ? `rounded-full gap-2 overflow-hidden bg-primary flex-row` : ""
-      } flex  w-full flex-1 min-w-[112px] min-h-14 mt-4 justify-center items-center`}
+      className={`flex w-full flex-1 min-w-[112px] min-h-16 mt-4 justify-center items-center transition-colors duration-500
+      ${
+        focused
+          ? "bg-primary-light dark:bg-primary-dark flex-row rounded-full gap-2 overflow-hidden"
+          : "bg-transparent"
+      }
+    `}
     >
       <Icon size={size} color={color} />
       {focused && <Text className="text-white font-bold">{label}</Text>}

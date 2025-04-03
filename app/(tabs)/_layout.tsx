@@ -1,17 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { Download, House, Search, UserCog } from "lucide-react-native";
 import TabIcon from "@/app/components/TabIcon";
+import { useColorScheme } from "react-native";
+import {
+  useSharedValue,
+  withTiming,
+  interpolateColor,
+  useAnimatedReaction,
+  runOnJS,
+} from "react-native-reanimated";
 
 export default function _layout() {
+  const colorScheme = useColorScheme();
+
+  const progress = useSharedValue(colorScheme === "dark" ? 1 : 0);
+  const [tabColor, setTabColor] = useState("#e4e1ff");
+
+  useAnimatedReaction(
+    () => progress.value,
+    (val) => {
+      const interpolated = interpolateColor(
+        val,
+        [0, 1],
+        ["#e4e1ff", "#0f0D23"]
+      );
+      runOnJS(setTabColor)(interpolated);
+    },
+    [progress]
+  );
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      progress.value = withTiming(colorScheme === "dark" ? 1 : 0, {
+        duration: 500,
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeout); // optional cleanup
+  }, [colorScheme]);
+
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarItemStyle: {
+          width: "100%",
+          height: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        tabBarStyle: {
+          backgroundColor: tabColor,
+          borderRadius: 50,
+          marginHorizontal: 20,
+          marginBottom: 36,
+          height: 52,
+          position: "absolute",
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: tabColor,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           headerShown: false,
           title: "Home",
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
@@ -28,7 +84,6 @@ export default function _layout() {
         options={{
           title: "Search",
           headerShown: false,
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
@@ -45,7 +100,6 @@ export default function _layout() {
         options={{
           title: "Saved",
           headerShown: false,
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
@@ -62,7 +116,6 @@ export default function _layout() {
         options={{
           title: "Profile",
           headerShown: false,
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}

@@ -6,10 +6,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: "#ae4bff",
-        primary: "#412be4",
         secondary: "#4865e5",
-        "gray-light": "#7d8bae",
+        "accent-dark": "#412be4",
+        "accent-light": "#9485ff",
+        "primary-dark": "#412be4",
+        "primary-light": "#9e90ff",
+        "modal-light-bg": "#e4e1ff",
+        "modal-dark-bg": "#14213d",
+        "modal-light-fg": "#808080",
+        "modal-dark-gfg": "#7d8bae",
         "dark-bg": "#0c0e1a",
         "dark-fg": "#f9f9f9",
         "light-bg": "#f9f9f9",
