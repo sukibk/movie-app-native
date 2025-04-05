@@ -1,4 +1,12 @@
-import { Image, ScrollView, useColorScheme, View } from "react-native";
+import {
+  Image,
+  Text,
+  ScrollView,
+  useColorScheme,
+  View,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
 import React, { useEffect } from "react";
 import Fade from "@/assets/images/hero-fade1.png";
 import Logo from "@/assets/images/logo.png";
@@ -9,8 +17,34 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
+import { useRouter } from "expo-router";
+import useFetch from "../hooks/useFetch";
+import { fetchMovies } from "@/app/utils/api";
+import MovieCard from "../components/MovieCard";
+import { getTrendingMovies } from "../utils/appwrite";
+import TrendingMovieCard from "../components/TrendingMovieCard";
 
 export default function index() {
+  const router = useRouter();
+
+  const {
+    data: movies,
+    loading: moviesLoading,
+    error: moviesError,
+  } = useFetch<Movie[]>({
+    fetchFunction: () => fetchMovies({ query: "" }),
+    autoFetch: true,
+  });
+
+  const {
+    data: trendingMovies,
+    loading: trendingMoviesLoading,
+    error: trendingMoviesError,
+  } = useFetch<TrendingMovie[]>({
+    fetchFunction: () => getTrendingMovies(),
+    autoFetch: true,
+  });
+
   const colorScheme = useColorScheme();
   const darkMode = colorScheme === "dark";
 
@@ -63,7 +97,58 @@ export default function index() {
             resizeMode="contain"
           />
         </View>
-        <SearchBar />
+        {(moviesLoading || trendingMoviesLoading) && (
+          <ActivityIndicator
+            size="large"
+            color={!darkMode ? "#9485ff" : "#412be4"}
+            className="mt-10 self-center"
+          />
+        )}
+        {(moviesError || trendingMoviesError) && (
+          <Text className="text-white">
+            Error: {moviesError?.message || trendingMoviesError?.message}
+          </Text>
+        )}
+        {trendingMovies && (
+          <View className="mt-10">
+            <Text className="text-light-fg dark:text-dark-fg text-lg font-bold mt-5 mb-3">
+              Trending Movies
+            </Text>
+            <FlatList
+              data={trendingMovies}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              ItemSeparatorComponent={() => <View className="w-8"></View>}
+              className="mb-2 mt-3 px-3 "
+              renderItem={({ item, index }) => (
+                <TrendingMovieCard
+                  movie={item}
+                  index={index}
+                  darkStyle={lightLogoStyle}
+                  lightStyle={darkLogoStyle}
+                />
+              )}
+              keyExtractor={(item) => item.movie_id.toString()}
+            />
+          </View>
+        )}
+        <Text className="text-light-fg dark:text-dark-fg text-lg font-bold mt-5 mb-3">
+          Latest Movies
+        </Text>
+        <FlatList
+          data={movies}
+          renderItem={({ item }) => <MovieCard movie={item} />}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={3}
+          columnWrapperStyle={{
+            justifyContent: "flex-start",
+            gap: 20,
+            paddingRight: 5,
+            marginBottom: 10,
+          }}
+          className="mt-2 pb-32 "
+          scrollEnabled={false}
+        />
       </ScrollView>
     </View>
   );

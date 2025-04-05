@@ -23,7 +23,7 @@ export default function _layout() {
       const interpolated = interpolateColor(
         val,
         [0, 1],
-        ["#e4e1ff", "#0f0D23"]
+        ["#e4e1ff", "#2f2b50"]
       );
       runOnJS(setTabColor)(interpolated);
     },
